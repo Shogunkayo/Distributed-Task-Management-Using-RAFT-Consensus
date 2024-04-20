@@ -51,10 +51,11 @@ class KVServer(BaseHTTPRequestHandler):
             metadata = self.rfile.read(content_length).decode("utf-8")
             metadata = json.loads(metadata)
 
-            if self.path == "/addTask":
+            if self.path == "/addUser":
                 try:
-                    ID = metadata["ID"]
-                    content = metadata["content"]
+                    username = metadata["username"]
+                    email = metadata["email"]
+                    password = metadata["password"]
 
                 except Exception as e:
                     print("ERROR: ", e)
@@ -68,7 +69,10 @@ class KVServer(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(metadata).encode("utf-8"))
 
-                query = "INSERT INTO Persons VALUES " + content
+                content = "(" + username + "," + email + "," + password + ")"
+                print(content)
+
+                query = "INSERT INTO Users (username, email, password) VALUES " + content
                 _g_kvstorage.update_database(query)
                 _g_kvstorage.append_to_log(query)
 
@@ -101,5 +105,3 @@ if __name__ == "__main__":
     httpServer = HTTPServer((selfAddr.split(":")[0], http_port), KVServer)
 
     httpServer.serve_forever()
-
-    thread.join()
