@@ -4,6 +4,7 @@ import json
 import sys
 import copy
 import time
+import datetime
 import uuid
 import mysql.connector
 import time
@@ -14,6 +15,17 @@ dbName = None
 server_no = None
 
 class KVServer(BaseHTTPRequestHandler):
+
+    def _set_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self._set_headers()
+
     def do_GET(self):
         '''
         Read from urls
@@ -65,29 +77,106 @@ class KVServer(BaseHTTPRequestHandler):
                     self.wfile.write(json.dumps({"error": "invalid request"}).encode('utf-8'))
                     return
 
-                self.send_header("Content-type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps(metadata).encode("utf-8"))
-
-                content = "(" + username + "," + email + "," + password + ")"
+                content = "(" + "\'"+ username + "\'"+ "," + "\'" + email + "\'"+ "," + "\'"+ password +"\'"+ ");"
                 print(content)
 
-                query = "INSERT INTO Users (username, email, password) VALUES " + content
+                query = "INSERT INTO Users (username, email, password) VALUES " + content 
                 _g_kvstorage.update_database(query)
                 _g_kvstorage.append_to_log(query)
 
                 print("Done")
-
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                response_data = {"message":"User added successfully"}
+                self.wfile.write(json.dumps(response_data).encode("utf-8"))
                 return
+            
 
+
+            elif self.path == "/addTask":
+                try:
+                    title = '"' + metadata["title"] + '"'
+                    description = '"' + metadata["description"] + '"'
+                    status = '"' + metadata["status"] + '"'
+                    priority = metadata["priority"]
+                    created_by = metadata["created_by"]
+                    
+                    # Set created_at and updated_at
+                    created_at = '"' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '"'
+                    updated_at = created_at
+
+                except KeyError as e:
+                    print("ERROR: Missing key in request data:", e)
+                    self.send_error(400, "Invalid request data")
+                    return
+
+                # Construct SQL query
+                query = "INSERT INTO Tasks (title, description, status, created_at, updated_at, priority, created_by) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                values = (title, description, status, created_at, updated_at, priority, created_by)
+
+                # Execute query and append to log
+                print(query % values)
+                _g_kvstorage.update_database(query % values)
+                _g_kvstorage.append_to_log(query % values)
+
+                # Send success response
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                response_data = {"message": "Task added successfully"}
+                self.wfile.write(json.dumps(response_data).encode("utf-8"))
+
+            elif self.path == "/checkUser":
+                print("Hello, CheckUser running...")
+                try:
+                    username = '"' + metadata["username"] +'"'
+                    password = '"' + metadata["password"] + '"'
+
+                except KeyError as e:
+                    print("ERROR: Missing key in request data:", e)
+                    self.send_error(400, "Invalid request data")
+                    return
+
+                # Construct SQL query to check if the user exists
+                query = "SELECT user_id FROM Users WHERE username = %s AND password = %s"
+                values = (username, password)
+
+                # Execute the query
+                _g_kvstorage.cursor.execute(query % values)
+                result = _g_kvstorage.cursor.fetchone()
+
+                for _ in _g_kvstorage.cursor:
+                    pass
+
+                # Check if user exists based on query result
+                if result:
+                    print("executing")
+                    self.send_response(200)
+                    # User exists and return ID
+                    user_id = result[0]
+                    self.send_header("Content-type", "application/json")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    response_data = {"exists": True, "userId": user_id}
+                    
+                else:
+                    # User does not exist
+                    self.send_response(404)
+                    self.send_header("Content-type", "application/json")
+                    response_data = {"exists": False}
+
+                self.end_headers()
+                self.wfile.write(json.dumps(response_data).encode("utf-8"))
+                
             else:
                 self.send_response(400)
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
                 self.wfile.write(json.dumps({"error": "Invalid URL"}).encode("utf-8"))
                 return
-
-
+            
 if __name__ == "__main__":
     if len(sys.argv) < 8:
         print('Usage: %s http_port dump_file.bin journal_file selfHost:port partner1Host:port partner2Host:port ...' % sys.argv[0])
