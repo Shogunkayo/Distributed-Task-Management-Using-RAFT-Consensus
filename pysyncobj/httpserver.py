@@ -235,12 +235,37 @@ class KVServer(BaseHTTPRequestHandler):
                 query = "INSERT INTO Task_Assign VALUES " + content
 
                 _g_kvstorage.update_database(query)
+                _g_kvstorage.append_to_log(query)
 
                 self.send_response(200)
                 self.send_header("Content-type", "application/json")
                 self.send_header("Access-Control-Allow-Origin", "*")
                 self.end_headers()
                 response_data = {"message": "Task assigned successfully"}
+                self.wfile.write(json.dumps(response_data).encode("utf-8"))
+
+            elif self.path == "/deleteTask":
+                try:
+                    taskid = str(metadata["taskid"])
+
+                except KeyError as e:
+                    print("ERROR: Missing key in request data:", e)
+                    self.send_error(400, "Invalid request data")
+                    return
+
+                query1 = "DELETE FROM Task_Assign WHERE task_id = " + taskid
+                query2 = "DELETE FROM Tasks WHERE task_id = " + taskid
+
+                _g_kvstorage.update_database(query1)
+                _g_kvstorage.update_database(query2)
+                _g_kvstorage.append_to_log(query1)
+                _g_kvstorage.append_to_log(query2)
+
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                response_data = {"message": "Task deleted successfully"}
                 self.wfile.write(json.dumps(response_data).encode("utf-8"))
                 
             else:
