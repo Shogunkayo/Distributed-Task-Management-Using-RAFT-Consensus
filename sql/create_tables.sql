@@ -1,12 +1,12 @@
 CREATE TABLE Users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT PRIMARY KEY,
     username VARCHAR(50),
     email VARCHAR(100),
     password VARCHAR(100)
 );
 
 CREATE TABLE Tasks (
-    task_id INT AUTO_INCREMENT PRIMARY KEY,
+    task_id INT PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
     status ENUM('TODO', 'IN_PROGRESS', 'DONE'),
@@ -20,7 +20,7 @@ CREATE TABLE Tasks (
 
 
 CREATE TABLE Task_Assign (
-    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+    assignment_id INT PRIMARY KEY,
     task_id INT,
     user_id INT,
     FOREIGN KEY (task_id) REFERENCES tasks(task_id),
