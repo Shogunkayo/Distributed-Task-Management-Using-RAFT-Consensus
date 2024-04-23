@@ -89,6 +89,7 @@ class KVServer(BaseHTTPRequestHandler):
 
             if self.path == "/addUser":
                 try:
+                    userid = metadata["userid"]
                     username = metadata["username"]
                     email = metadata["email"]
                     password = metadata["password"]
@@ -101,10 +102,10 @@ class KVServer(BaseHTTPRequestHandler):
                     self.wfile.write(json.dumps({"error": "invalid request"}).encode('utf-8'))
                     return
 
-                content = "(" + "\'"+ username + "\'"+ "," + "\'" + email + "\'"+ "," + "\'"+ password +"\'"+ ");"
+                content = "(" + str(userid) + "," + "\'"+ username + "\'" + "," + "\'" + email + "\'"+ "," + "\'"+ password +"\'"+ ");"
                 print(content)
 
-                query = "INSERT INTO Users (username, email, password) VALUES " + content 
+                query = "INSERT INTO Users (user_id, username, email, password) VALUES " + content 
                 _g_kvstorage.update_database(query)
                 _g_kvstorage.append_to_log(query)
 
@@ -121,6 +122,7 @@ class KVServer(BaseHTTPRequestHandler):
 
             elif self.path == "/addTask":
                 try:
+                    taskid = '"' + metadata["taskid"] + '"'
                     title = '"' + metadata["title"] + '"'
                     description = '"' + metadata["description"] + '"'
                     status = '"' + metadata["status"] + '"'
@@ -137,8 +139,8 @@ class KVServer(BaseHTTPRequestHandler):
                     return
 
                 # Construct SQL query
-                query = "INSERT INTO Tasks (title, description, status, created_at, updated_at, priority, created_by) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                values = (title, description, status, created_at, updated_at, priority, created_by)
+                query = "INSERT INTO Tasks (task_id, title, description, status, created_at, updated_at, priority, created_by) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                values = (taskid, title, description, status, created_at, updated_at, priority, created_by)
 
                 # Execute query and append to log
                 print(query % values)
@@ -193,6 +195,14 @@ class KVServer(BaseHTTPRequestHandler):
 
                 self.end_headers()
                 self.wfile.write(json.dumps(response_data).encode("utf-8"))
+
+            # elif self.path == "/updateTask":
+            #     try:
+            #         title = '"' + metadata["title"] + '"'
+            #         description = '"' + metadata["description"] + '"'
+            #         status = '"' + metadata["status"] + '"'
+            #         priority = metadata["priority"]
+            #         created_by = metadata["created_by"]
                 
             else:
                 self.send_response(400)
