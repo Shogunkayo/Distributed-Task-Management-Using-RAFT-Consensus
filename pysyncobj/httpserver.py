@@ -122,7 +122,7 @@ class KVServer(BaseHTTPRequestHandler):
 
             elif self.path == "/addTask":
                 try:
-                    taskid = '"' + metadata["taskid"] + '"'
+                    taskid = '"' + str(metadata["taskid"]) + '"'
                     title = '"' + metadata["title"] + '"'
                     description = '"' + metadata["description"] + '"'
                     status = '"' + metadata["status"] + '"'
@@ -196,13 +196,29 @@ class KVServer(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(response_data).encode("utf-8"))
 
-            # elif self.path == "/updateTask":
-            #     try:
-            #         title = '"' + metadata["title"] + '"'
-            #         description = '"' + metadata["description"] + '"'
-            #         status = '"' + metadata["status"] + '"'
-            #         priority = metadata["priority"]
-            #         created_by = metadata["created_by"]
+            elif self.path == "/updateTask":
+                try:
+                    taskid = '"' + str(metadata["taskid"]) + '"'
+                    title = '"' + metadata["title"] + '"'
+                    description = '"' + metadata["description"] + '"'
+                    status = '"' + metadata["status"] + '"'
+                    priority = '"' + str(metadata["priority"]) + '"'
+
+                    updated_at = '"' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '"'
+
+                except KeyError as e:
+                    print("ERROR: Missing key in request data:", e)
+                    self.send_error(400, "Invalid request data")
+                    return
+
+                _g_kvstorage.modify_task(taskid, title, description, status, priority, updated_at)
+
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                response_data = {"message": "Task updated successfully"}
+                self.wfile.write(json.dumps(response_data).encode("utf-8"))
                 
             else:
                 self.send_response(400)
