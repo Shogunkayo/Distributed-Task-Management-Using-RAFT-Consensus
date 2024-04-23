@@ -41,8 +41,32 @@ class KVServer(BaseHTTPRequestHandler):
                 print(record)
 
             elif path_parts[0] == "getQueryLog":
-                query_log = _g_kvstorage.get_query_log() 
+                query_log = _g_kvstorage.get_query_log()
                 print(query_log)
+
+            elif path_parts[0] == "getTasksByUser":
+                try:
+                    user_id = int(path_parts[1])  # Assuming user ID is passed in the URL
+                except ValueError:
+                    self.send_response(400)
+                    self.send_header("Content-type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": "Invalid user ID"}).encode("utf-8"))
+                    return
+
+                tasks = _g_kvstorage.get_tasks_by_user(user_id)  # Implement this method in KVStorage
+                if tasks is not None:
+                    self.send_response(200, tasks)
+                    self.send_header("Content-type", "application/json")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write(json.dumps(tasks).encode("utf-8"))
+                else:
+                    self.send_response(404)
+                    self.send_header("Content-type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": "User not found or has no tasks"}).encode("utf-8"))
+
 
             else:
                 self.send_response(400)
