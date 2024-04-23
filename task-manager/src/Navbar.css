@@ -1,0 +1,21 @@
+/* Navbar.css */
+
+.navbar-container {
+    display: flex;
+    margin-bottom: 20px;
+    background-color: #007bff; /* Blue background color */
+    border-radius: 5px;
+    overflow: hidden; /* Ensure rounded corners */
+  }
+  
+  .navbar-link {
+    text-decoration: none;
+    color: #fff; /* White text color */
+    padding: 10px 20px; /* Padding */
+    transition: background-color 0.3s ease; /* Smooth transition */
+  }
+  
+  .navbar-link:hover {
+    background-color: #0056b3; /* Darker blue hover background color */
+  }
+  

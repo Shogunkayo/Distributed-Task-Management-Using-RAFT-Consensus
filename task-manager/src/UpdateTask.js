@@ -19,7 +19,7 @@ function AddTask({ userId }) {
 
     try {
       // Make API call to addTask endpoint
-      const response = await axios.post('http://localhost:8000/addTask', {
+      const response = await axios.post('http://localhost:8000/updatetask', {
         taskid,
         title,
         description,
@@ -28,16 +28,16 @@ function AddTask({ userId }) {
         created_by: userId
       });
 
-      setMessage('Task added successfully');
+      setMessage('Task updated successfully');
     } catch (error) {
-      console.error('Error adding task:', error);
-      setError('Failed to add task');
+      console.error('Error updating task:', error);
+      setError('Failed to update task');
     }
   };
 
   return (
     <div className="container">
-      <h1>Add Task</h1>
+      <h1>Update Task</h1>
       <input type="text" placeholder="TaskID" value={taskid} onChange={e => setTaskID(e.target.value)} />
       <input type="text" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
       <input type="text" placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />

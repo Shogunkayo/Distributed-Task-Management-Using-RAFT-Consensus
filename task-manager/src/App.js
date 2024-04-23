@@ -5,12 +5,20 @@ import { Routes, Route} from 'react-router-dom'; // Import BrowserRouter, Routes
 import './App.css'; // Import CSS file for styling
 import AddTask from './AddTask.js'; // Import AddTask component
 import { set } from 'mongoose';
+import Navbar from './navbar.js'; // Sidebar component
+import AllTasks from './AllTasks.js';
+import UpdateTask from './UpdateTask.js';
+import DeleteTask from './DeleteTask.js';
+import AssignedTasks from './AssignedTasks.js';
+import AssignTask from './AssignTask.js';
+import Dashboard from './Dashboard.js';
 
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [username, setUsername] = useState('');
+  const [userid, setUserID] = useState('')
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,7 +30,7 @@ function App() {
     const loggedInUser = sessionStorage.getItem("userId");
     if (loggedInUser) {
       setUserId(loggedInUser);
-      navigate(`/addtask?userId=${loggedInUser}`);
+      navigate(`/dashboard`);
     }
   }, [navigate]);
 
@@ -49,10 +57,9 @@ function App() {
         setError('')
         setTimeout(() => {
           setMessage('');
+          navigate(`dashboard`);
         }, 2000);
 
-        
-        navigate(`/addtask?userId=${response.data.userId}`);
       } else {
         setError('Invalid username or password');
       }
@@ -70,17 +77,19 @@ function App() {
 
     try {
       const response = await axios.post('http://localhost:8000/addUser', {
+        userid,
         username,
         email,
         password
       });
-      sessionStorage.setItem('userId', response.data.userId);
+      sessionStorage.setItem('userId', userid);
       setMessage('User registered successfully');
+      setShowLogin(false); // Hide login form after 2 seconds
+      setShowRegister(false); // Hide register form after 2 seconds
       setTimeout(() => {
-        setShowLogin(false); // Hide login form after 2 seconds
-        setShowRegister(false); // Hide register form after 2 seconds
+      navigate(`/dashboard`);  
       }, 2000);
-      navigate(`/addtask?userId=${response.data.userId}`);
+      
     } catch (error) {
       console.error('Error registering user:', error);
       setError('Failed to register user');
@@ -90,7 +99,9 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Welcome to Task Manager</h1>
+      <h1>Task Manager</h1>
+      {userId && <Navbar />}
+
       {!userId && !showLogin && !showRegister && (
         <>
           <button onClick={() => setShowLogin(true)}>Login</button>
@@ -109,6 +120,7 @@ function App() {
       {showRegister && (
         <div className="form-container">
           <h2>Register</h2>
+          <input type="text" placeholder="User ID" value={userid} onChange={e => setUserID(e.target.value)} />
           <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
           <input type="text" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
           <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
@@ -120,7 +132,10 @@ function App() {
       {message && <p className="success">{message}</p>}
 
       <Routes>
-        <Route path="/addtask" element={<AddTask userId={userId}/>} />
+        <Route path ="/dashboard" element={<Dashboard/>}/>
+        <Route path="/addtask" element={userId && <AddTask userId={userId}/>} />
+        <Route path="/alltasks/:userId" element={<AllTasks/>} />
+        <Route path="/updatetask" element={<UpdateTask />} />
       </Routes>
     </div>
   );
