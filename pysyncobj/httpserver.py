@@ -219,6 +219,29 @@ class KVServer(BaseHTTPRequestHandler):
                 self.end_headers()
                 response_data = {"message": "Task updated successfully"}
                 self.wfile.write(json.dumps(response_data).encode("utf-8"))
+
+            elif self.path == "/assignTask":
+                try:
+                    assignmentid = str(metadata["assignmentid"])
+                    taskid = str(metadata["taskid"])
+                    userid = str(metadata["userid"])
+
+                except KeyError as e:
+                    print("ERROR: Missing key in request data:", e)
+                    self.send_error(400, "Invalid request data")
+                    return
+
+                content = "(" + assignmentid + "," + taskid + "," + userid + ");"
+                query = "INSERT INTO Task_Assign VALUES " + content
+
+                _g_kvstorage.update_database(query)
+
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                response_data = {"message": "Task assigned successfully"}
+                self.wfile.write(json.dumps(response_data).encode("utf-8"))
                 
             else:
                 self.send_response(400)
