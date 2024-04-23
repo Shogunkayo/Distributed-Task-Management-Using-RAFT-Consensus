@@ -30,6 +30,8 @@ function AllTasks() {
             <th>Description</th>
             <th>Status</th>
             <th>Priority</th>
+            <th>Created Time</th>
+            <th>Updated Time</th>
           </tr>
         </thead>
         <tbody>
@@ -39,6 +41,8 @@ function AllTasks() {
               <td>{task.description}</td>
               <td>{task.status}</td>
               <td>{task.priority}</td>
+              <td>{task.created_at}</td>
+              <td>{task.updated_at}</td>
             </tr>
           ))}
         </tbody>

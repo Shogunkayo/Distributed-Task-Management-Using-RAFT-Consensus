@@ -30,7 +30,7 @@ function App() {
     const loggedInUser = sessionStorage.getItem("userId");
     if (loggedInUser) {
       setUserId(loggedInUser);
-      navigate(`/dashboard`);
+      //navigate(`/dashboard`);
     }
   }, [navigate]);
 
@@ -87,6 +87,7 @@ function App() {
       setShowLogin(false); // Hide login form after 2 seconds
       setShowRegister(false); // Hide register form after 2 seconds
       setTimeout(() => {
+      setMessage('');
       navigate(`/dashboard`);  
       }, 2000);
       
@@ -132,7 +133,6 @@ function App() {
       {message && <p className="success">{message}</p>}
 
       <Routes>
-        <Route path ="/dashboard" element={<Dashboard/>}/>
         <Route path="/addtask" element={userId && <AddTask userId={userId}/>} />
         <Route path="/alltasks/:userId" element={<AllTasks/>} />
         <Route path="/updatetask" element={<UpdateTask />} />

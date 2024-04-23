@@ -191,6 +191,7 @@ class KVServer(BaseHTTPRequestHandler):
                     # User does not exist
                     self.send_response(404)
                     self.send_header("Content-type", "application/json")
+                    self.send_header("Access-Control-Allow-Origin", "*")
                     response_data = {"exists": False}
 
                 self.end_headers()
@@ -209,6 +210,9 @@ class KVServer(BaseHTTPRequestHandler):
                 except KeyError as e:
                     print("ERROR: Missing key in request data:", e)
                     self.send_error(400, "Invalid request data")
+                    self.send_header("Content-type", "application/json")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
                     return
 
                 _g_kvstorage.modify_task(taskid, title, description, status, priority, updated_at)

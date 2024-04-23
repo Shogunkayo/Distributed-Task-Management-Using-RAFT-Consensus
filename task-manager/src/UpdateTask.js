@@ -24,8 +24,7 @@ function AddTask({ userId }) {
         title,
         description,
         status,
-        priority,
-        created_by: userId
+        priority
       });
 
       setMessage('Task updated successfully');
@@ -43,7 +42,7 @@ function AddTask({ userId }) {
       <input type="text" placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
       <input type="text" placeholder="Status" value={status} onChange={e => setStatus(e.target.value)} />
       <input type="text" placeholder="Priority" value={priority} onChange={e => setPriority(e.target.value)} />
-      <button onClick={addTask}>Add Task</button>
+      <button onClick={addTask}>Update Task</button>
       {error && <p className="error">{error}</p>}
       {message && <p className="success">{message}</p>}
     </div>
