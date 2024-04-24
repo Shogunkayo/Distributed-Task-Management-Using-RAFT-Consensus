@@ -2,9 +2,10 @@
 
 .navbar-container {
     display: flex;
-    margin-bottom: 20px;
+    margin-top: 30px;
+    margin-bottom: 40px;
     background-color: #007bff; /* Blue background color */
-    border-radius: 5px;
+    border-radius: 10px;
     overflow: hidden; /* Ensure rounded corners */
   }
   

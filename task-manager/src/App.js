@@ -12,6 +12,7 @@ import DeleteTask from './DeleteTask.js';
 import AssignedTasks from './AssignedTasks.js';
 import AssignTask from './AssignTask.js';
 import Dashboard from './Dashboard.js';
+import ChangeStatus from './ChangeStatus.js'
 
 
 function App() {
@@ -87,7 +88,7 @@ function App() {
       setShowLogin(false); // Hide login form after 2 seconds
       setShowRegister(false); // Hide register form after 2 seconds
       setTimeout(() => {
-      setMessage('');
+      setMessage('')
       navigate(`/dashboard`);  
       }, 2000);
       
@@ -100,7 +101,8 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Task Manager</h1>
+      <h1>TaskRaft - Task Management Application</h1>
+      <h9></h9>
       {userId && <Navbar />}
 
       {!userId && !showLogin && !showRegister && (
@@ -133,9 +135,14 @@ function App() {
       {message && <p className="success">{message}</p>}
 
       <Routes>
+        <Route path="/dashboard" element={<Dashboard/>} />
         <Route path="/addtask" element={userId && <AddTask userId={userId}/>} />
         <Route path="/alltasks/:userId" element={<AllTasks/>} />
         <Route path="/updatetask" element={<UpdateTask />} />
+        <Route path="/deletetask" element={<DeleteTask/>} />
+        <Route path="/assigntask" element={<AssignTask/>} />
+        <Route path="/changetaskstatus" element={<ChangeStatus/>} />
+        <Route path="/assignedtasks" element={<AssignedTasks/>}/>
       </Routes>
     </div>
   );

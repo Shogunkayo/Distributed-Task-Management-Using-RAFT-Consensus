@@ -14,7 +14,8 @@ function Navbar() {
       <Link to={`/deletetask?userId=${userId}`} className="navbar-link">Delete Task</Link>
       <Link to={`/alltasks/${userId}`} className="navbar-link">View All Tasks</Link>
       <Link to={`/assignedtasks?userId=${userId}`} className="navbar-link">View Assigned Tasks</Link>
-      <Link to={`/assigntasks?userId=${userId}`} className="navbar-link">Assign Tasks</Link>
+      <Link to={`/assigntask?userId=${userId}`} className="navbar-link">Assign Tasks</Link>
+      <Link to={`/changetaskstatus?userId=${userId}`} className="navbar-link">Change Task Status</Link>
     </div>
   );
 }

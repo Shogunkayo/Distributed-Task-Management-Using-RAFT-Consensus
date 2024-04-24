@@ -22,7 +22,7 @@ function AllTasks() {
 
   return (
     <div>
-      <h2>All Tasks</h2>
+      <h1>View All Tasks</h1>
       <table>
         <thead>
           <tr>
